@@ -1,5 +1,6 @@
 import express from "express";
 import subjectsRouter from "./db/routes/subjects";
+import departmentsRouter from "./db/routes/departments";
 import cors from "cors";
 
 const app = express();
@@ -18,6 +19,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use('/api/subjects', subjectsRouter);
+app.use('/api/departments', departmentsRouter);
 
 app.get("/", (_request, response) => {
   response.send("Classroom backend is running.");
