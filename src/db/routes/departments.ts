@@ -29,7 +29,7 @@ router.get("/", async (req, res) => {
         //combine all filter conditions using 'and' operator
         const combinedFilter = filterConditions.length > 0 ? and(...filterConditions) : undefined;
         const countResult = await db
-            .select({ count: sql<number>`count(*)` })
+            .select({ count: sql<number>`count(*)`.mapWith(Number) })
             .from(departments)
             .where(combinedFilter);
 
@@ -37,11 +37,11 @@ router.get("/", async (req, res) => {
         const departmentsList = await db
             .select({
                 ...getTableColumns(departments),
-                subjectsCount: sql<number>`count(${subjects.id})`,
+                subjectsCount: sql<number>`count(${subjects.id})`.mapWith(Number),
             }).from(departments)
             .leftJoin(subjects, eq(subjects.departmentId, departments.id))
             .where(combinedFilter)
-            .groupBy(...Object.values(departments))
+            .groupBy(departments.id)
             .orderBy(desc(departments.id))
             .limit(limitPerPage)
             .offset(offset);
@@ -64,15 +64,19 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
     const { id } = req.params;
+    const departmentId = Number(id);
+    if (!Number.isInteger(departmentId) || departmentId <= 0) {
+        res.status(400).json({ error: "Invalid department ID" });
+    }
     try {
         const departmentDetails = await db.select({
             ...getTableColumns(departments),
-            subjectsCount: sql<number>`count(${subjects.id})`,
+            subjectsCount: sql<number>`count(${subjects.id})`.mapWith(Number),
         })
             .from(departments)
             .leftJoin(subjects, eq(subjects.departmentId, departments.id))
-            .where(eq(departments.id, Number(id)))
-            .groupBy(...Object.values(departments));
+            .where(eq(departments.id, departmentId))
+            .groupBy(departments.id)
         res.status(200).json(departmentDetails[0] || null);
     } catch (e) {
         console.error(`GET /departments/:id error: ${e}`);
@@ -94,7 +98,7 @@ router.get("/:id/subjects", async (req, res) => {
     try {
         const countResult = await db
             .select({
-                count: sql<number>`count(*)`,
+                count: sql<number>`count(*)`.mapWith(Number),
             })
             .from(subjects)
             .where(eq(subjects.departmentId, departmentId));
