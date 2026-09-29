@@ -55,7 +55,7 @@ export async function securityMiddleware(
 		}
 
         if (decision.isDenied() && decision.reason.isShield()) {
-			res.status(429).json({ error: "Too Many Requests", message: "Request blocked by security policy" });
+			res.status(403).json({ error: "Forbidden", message: "Request blocked by security policy" });
 			return;
 		}
 
@@ -72,7 +72,7 @@ export async function securityMiddleware(
 
 		next();
 	} catch (e) {
-		console.error("archject middleware error ", e);
+		console.error("Arcjet middleware error", e);
 		res.status(500).json({
 			error: "Internal Server Error",
 			message: e instanceof Error ? e.message : "An unexpected error occurred",
