@@ -31,7 +31,7 @@ export async function securityMiddleware(
 				limitMessage = "Student request limit exceeded (10 per minute)";
 				break;
 			default:
-				limit = 5;
+				limit = 10;
 				limitMessage = "Please sign up for higher limits";
 		}
 
