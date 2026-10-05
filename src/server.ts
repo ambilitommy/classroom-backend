@@ -1,6 +1,6 @@
 import express from "express";
-import subjectsRouter from "./db/routes/subjects";
-import departmentsRouter from "./db/routes/departments";
+import subjectsRouter from "./db/routes/subjects.js";
+import departmentsRouter from "./db/routes/departments.js";
 import cors from "cors";
 import { securityMiddleware } from "./middleware/security";
 
